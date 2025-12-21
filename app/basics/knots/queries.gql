@@ -1,0 +1,8 @@
+query allKnots {
+  allKnots {
+    name
+    thumbnail {
+      url
+    }
+  }
+}
