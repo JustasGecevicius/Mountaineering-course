@@ -1,15 +1,26 @@
-"use client";
-type BasicKnotsPageProps = {};
+import CardBottomImage from "@/components/cards/CardBottomImage";
+import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
 
-function BasicKnotsPage(props: BasicKnotsPageProps) {
-  const { children } = props;
+type AllKnotsPageProps = {};
+
+async function AllKnotsPage(props: AllKnotsPageProps) {
+  const query = loadQuery("allKnots");
+  const knots = await fetchDato(query);
 
   return (
     <div>
-      KNOTS
-      {children}
+      {knots.allKnots.map((knot) => {
+        return (
+          <CardBottomImage
+            key={knot.name}
+            src={knot.thumbnail.url}
+            title={knot.name}
+            description={knot.description}
+          />
+        );
+      })}
     </div>
   );
 }
 
-export default BasicKnotsPage;
+export default AllKnotsPage;
