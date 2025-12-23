@@ -4,5 +4,6 @@ query allKnots {
     thumbnail {
       url
     }
+    id
   }
 }

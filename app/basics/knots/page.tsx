@@ -16,6 +16,7 @@ async function AllKnotsPage(props: AllKnotsPageProps) {
             src={knot.thumbnail.url}
             title={knot.name}
             description={knot.description}
+            redirectUrl={`/basics/knot/${knot.id}`}
           />
         );
       })}

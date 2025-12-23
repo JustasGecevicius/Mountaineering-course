@@ -1,31 +1,33 @@
 import GifPlayer from "@/components/gif/player";
-import { fetchDato } from "@/lib/datocms/datocms";
+import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
+import { AccordionComponent } from "./components/accordion";
 
 type KnotPageProps = {};
 
-const BASIC_KNOTS_CONTENT_QUERY = `
-  query allKnots {
-    allKnots {
-        name
-        gif {
-        url
-        mimeType
-        filename
-        size
-        }
-    }
-  }
-`;
-
 export default async function KnotPage(props: KnotPageProps) {
-  const { params } = props;
-  const datoPromise = fetchDato(BASIC_KNOTS_CONTENT_QUERY);
-  const [{ id }, knotData] = await Promise.all([params, datoPromise]);
+  try {
+    const { id } = await props.params;
+    const query = loadQuery("knotById");
+    const knotData = await fetchDato(query, { id });
 
-  return (
-    <div>
-      KNOT {id}
-      <GifPlayer src={knotData?.allKnots?.[0]?.gif?.url || ""} autoPlay loop />
-    </div>
-  );
+    const { knot } = knotData || {};
+    const { gif, name, description, history, uses } = knot || {};
+
+    const accordionData = [
+      { triggerText: "Description", contentText: description || "" },
+      { triggerText: "History", contentText: history || "" },
+      { triggerText: "Uses", contentText: uses || "" },
+    ];
+
+    return (
+      <div className="flex flex-col w-full gap-4 justify-start items-start">
+        <h1>{name}</h1>
+        <GifPlayer src={gif?.url} autoPlay loop frameDelay={1000} />
+        <AccordionComponent data={accordionData} />
+      </div>
+    );
+  } catch (error) {
+    console.error("Error fetching knot data:", error);
+    return <div>Error loading knot data.</div>;
+  }
 }

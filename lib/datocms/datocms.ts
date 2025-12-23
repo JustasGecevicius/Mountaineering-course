@@ -1,28 +1,8 @@
-import { executeQuery } from "@datocms/cda-client";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { cache } from "react";
 
 const DATO_API_URL = "https://graphql.datocms.com/";
 const API_TOKEN = process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN;
-
-const dedupedPerformRequest = cache(async (serializedArgs) => {
-  return executeQuery(...JSON.parse(serializedArgs));
-});
-
-export function performRequest(query, options?: {}) {
-  console.log("TOKEN", process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN);
-  return dedupedPerformRequest(
-    JSON.stringify([
-      query,
-      {
-        ...options,
-        token: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN,
-        environment: process.env.NEXT_PUBLIC_DATOCMS_ENVIRONMENT,
-      },
-    ])
-  );
-}
 
 export async function fetchDato<T>(query: string, variables?: Record<string, any>): Promise<T> {
   const res = await fetch(DATO_API_URL, {

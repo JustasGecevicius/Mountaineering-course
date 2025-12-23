@@ -1,0 +1,12 @@
+query KnotById($id: ItemId!) {
+  knot(filter: { id: { eq: $id } }) {
+    id
+    name
+    description
+    history
+    uses
+    gif {
+      url
+    }
+  }
+}

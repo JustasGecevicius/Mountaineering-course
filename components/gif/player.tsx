@@ -1,7 +1,7 @@
 "use client";
 
 import { parseGIF, decompressFrames } from "gifuct-js";
-import { useEffect, useRef, useState } from "react";
+import { SyntheticEvent, useCallback, useEffect, useRef, useState } from "react";
 
 type GifPlayerProps = {
   src: string; // e.g. "/gifs/example.gif" or full URL
@@ -9,6 +9,7 @@ type GifPlayerProps = {
   loop?: boolean;
   width?: number;
   height?: number;
+  frameDelay?: number;
 };
 
 export default function GifPlayer({
@@ -17,6 +18,7 @@ export default function GifPlayer({
   loop = true,
   width,
   height,
+  frameDelay,
 }: GifPlayerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -27,10 +29,80 @@ export default function GifPlayer({
   const timeoutRef = useRef<number | null>(null);
 
   const [, forceRender] = useState(0); // UI updates only
+  const [isPaused, setIsPaused] = useState(false);
 
-  // ---------------------------
-  // Fetch & decode GIF
-  // ---------------------------
+  // Drawing
+  const drawFrame = useCallback((index: number) => {
+    const ctx = ctxRef.current;
+    const frame = framesRef.current[index];
+    if (!ctx || !frame) return;
+
+    const imageData = ctx.createImageData(frame.dims.width, frame.dims.height);
+
+    imageData.data.set(frame.patch);
+
+    ctx.putImageData(imageData, frame.dims.left, frame.dims.top);
+
+    forceRender((n) => n + 1);
+  }, []);
+
+  const tick = useCallback(() => {
+    if (!playingRef.current || !framesRef.current || typeof frameIndexRef.current !== "number")
+      return;
+
+    drawFrame(frameIndexRef.current);
+
+    const frame = framesRef.current[frameIndexRef.current];
+    const delay = Math.max(frameDelay || frame?.delay || 0, 20); // ms
+
+    frameIndexRef.current++;
+
+    if (frameIndexRef.current >= framesRef.current.length) {
+      if (!loop) {
+        stop();
+        return;
+      }
+      frameIndexRef.current = 0;
+    }
+
+    timeoutRef.current = window.setTimeout(tick, delay);
+  }, [drawFrame, frameDelay, loop, stop]);
+
+  const nextFrame = useCallback(
+    (e: SyntheticEvent) => {
+      e?.stopPropagation();
+      frameIndexRef.current = (frameIndexRef.current + 1) % framesRef.current.length;
+      drawFrame(frameIndexRef.current);
+    },
+    [drawFrame]
+  );
+
+  // Playback controls
+  const startStop = useCallback(() => {
+    if (playingRef.current) {
+      playingRef.current = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+        setIsPaused(true);
+      }
+    } else {
+      playingRef.current = true;
+      setIsPaused(false);
+      tick();
+    }
+  }, []);
+
+  const prevFrame = useCallback(
+    (e: SyntheticEvent) => {
+      e?.stopPropagation();
+      frameIndexRef.current =
+        (frameIndexRef.current - 1 + framesRef.current.length) % framesRef.current.length;
+      drawFrame(frameIndexRef.current);
+    },
+    [drawFrame]
+  );
+
   useEffect(() => {
     let cancelled = false;
 
@@ -54,7 +126,7 @@ export default function GifPlayer({
 
       drawFrame(0);
 
-      if (autoPlay) play();
+      if (autoPlay) startStop();
     }
 
     loadGif();
@@ -65,87 +137,27 @@ export default function GifPlayer({
     };
   }, [src]);
 
-  // ---------------------------
-  // Drawing
-  // ---------------------------
-  function drawFrame(index: number) {
-    const ctx = ctxRef.current;
-    const frame = framesRef.current[index];
-    if (!ctx || !frame) return;
-
-    const imageData = ctx.createImageData(frame.dims.width, frame.dims.height);
-
-    imageData.data.set(frame.patch);
-
-    ctx.putImageData(imageData, frame.dims.left, frame.dims.top);
-
-    forceRender((n) => n + 1);
-  }
-
-  // ---------------------------
-  // Playback controls
-  // ---------------------------
-  function play() {
-    if (playingRef.current) return;
-    playingRef.current = true;
-    tick();
-  }
-
-  function stop() {
-    playingRef.current = false;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }
-
-  function tick() {
-    if (!playingRef.current || !framesRef.current || typeof frameIndexRef.current !== "number")
-      return;
-
-    drawFrame(frameIndexRef.current);
-
-    const frame = framesRef.current[frameIndexRef.current];
-    const delay = Math.max((frame?.delay || 0) * 10, 20); // ms
-
-    frameIndexRef.current++;
-
-    if (frameIndexRef.current >= framesRef.current.length) {
-      if (!loop) {
-        stop();
-        return;
-      }
-      frameIndexRef.current = 0;
-    }
-
-    timeoutRef.current = window.setTimeout(tick, delay);
-  }
-
-  function nextFrame() {
-    stop();
-    frameIndexRef.current = (frameIndexRef.current + 1) % framesRef.current.length;
-    drawFrame(frameIndexRef.current);
-  }
-
-  function prevFrame() {
-    stop();
-    frameIndexRef.current =
-      (frameIndexRef.current - 1 + framesRef.current.length) % framesRef.current.length;
-    drawFrame(frameIndexRef.current);
-  }
-
-  // ---------------------------
-  // UI
-  // ---------------------------
   return (
-    <div style={{ display: "inline-flex", flexDirection: "column", gap: 8 }}>
-      <canvas ref={canvasRef} style={{ border: "1px solid #ccc" }} />
-
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={prevFrame}>◀</button>
-        <button onClick={play}>▶</button>
-        <button onClick={stop}>⏸</button>
-        <button onClick={nextFrame}>▶▶</button>
+    <div className="relative rounded-3xl overflow-hidden">
+      <canvas ref={canvasRef} />
+      <div
+        className="flex gap-2 absolute bottom-0 top-0 left-0 right-0 justify-between"
+        onClick={startStop}
+      >
+        {isPaused && (
+          <div className="absolute top-0 bottom-0 left-0 right-0 inset-0 bg-black/30 flex items-center">
+            <div className="w-full flex justify-between items-center p-4">
+              <img onClick={prevFrame} src="/left_arrow.png" alt="left_arrow" className="w-8" />
+              <img src="/pause_button.png" alt="pause_button" className="w-8" />
+              <img
+                onClick={nextFrame}
+                src="/right_arrow.png"
+                alt="right_arrow"
+                className="w-8 aspect-square"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
