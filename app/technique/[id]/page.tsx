@@ -11,12 +11,13 @@ export default async function KnotPage(props: KnotPageProps) {
     const knotData = await fetchDato(query, { id });
 
     const { knot } = knotData || {};
-    const { gif, name, description, history, uses } = knot || {};
+    const { gif, name, description, history, uses, linkedKnots } = knot || {};
 
     const accordionData = [
       { triggerText: "Description", contentText: description || "" },
       { triggerText: "History", contentText: history || "" },
       { triggerText: "Uses", contentText: uses || "" },
+      { triggerText: "Linked", contentElements: linkedKnots?.links || [] },
     ];
 
     return (

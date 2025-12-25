@@ -3,8 +3,8 @@ import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
 
 type AllKnotsPageProps = {};
 
-async function AllKnotsPage(props: AllKnotsPageProps) {
-  const query = loadQuery("allKnots");
+async function BasicKnotsPage(props: AllKnotsPageProps) {
+  const query = loadQuery("basicKnots");
   const knots = await fetchDato(query);
 
   return (
@@ -16,7 +16,7 @@ async function AllKnotsPage(props: AllKnotsPageProps) {
             src={knot.thumbnail.url}
             title={knot.name}
             description={knot.description}
-            redirectUrl={`/basics/knot/${knot.id}`}
+            redirectUrl={`/knot/${knot.id}`}
           />
         );
       })}
@@ -24,4 +24,4 @@ async function AllKnotsPage(props: AllKnotsPageProps) {
   );
 }
 
-export default AllKnotsPage;
+export default BasicKnotsPage;

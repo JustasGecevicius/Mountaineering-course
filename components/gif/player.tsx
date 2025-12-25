@@ -59,14 +59,13 @@ export default function GifPlayer({
 
     if (frameIndexRef.current >= framesRef.current.length) {
       if (!loop) {
-        stop();
         return;
       }
       frameIndexRef.current = 0;
     }
 
     timeoutRef.current = window.setTimeout(tick, delay);
-  }, [drawFrame, frameDelay, loop, stop]);
+  }, [drawFrame, frameDelay, loop]);
 
   const nextFrame = useCallback(
     (e: SyntheticEvent) => {
@@ -133,7 +132,6 @@ export default function GifPlayer({
 
     return () => {
       cancelled = true;
-      stop();
     };
   }, [src]);
 

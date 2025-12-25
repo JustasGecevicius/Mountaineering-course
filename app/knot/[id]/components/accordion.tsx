@@ -20,7 +20,16 @@ export const AccordionComponent = (props: AccordionComponentPropsType) => {
         data.map((item, index) => (
           <AccordionItem key={index} value={`item-${index}`}>
             <AccordionTrigger>{item.triggerText}</AccordionTrigger>
-            <AccordionContent>{item.contentText}</AccordionContent>
+            {item.contentText && <AccordionContent>{item.contentText}</AccordionContent>}
+            {item.contentElements && (
+              <AccordionContent>
+                {item.contentElements.map((element) => (
+                  <a href={`/knot/${element.id}`} key={element.id}>
+                    {element.name}
+                  </a>
+                ))}
+              </AccordionContent>
+            )}
           </AccordionItem>
         ))}
     </Accordion>

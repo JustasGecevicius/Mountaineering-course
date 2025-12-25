@@ -1,0 +1,9 @@
+query basicKnots {
+  allKnots(filter: { isbasic: { eq: true } }) {
+    name
+    thumbnail {
+      url
+    }
+    id
+  }
+}

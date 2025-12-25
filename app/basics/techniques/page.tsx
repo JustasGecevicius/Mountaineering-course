@@ -4,19 +4,19 @@ import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
 type AllKnotsPageProps = {};
 
 async function AllKnotsPage(props: AllKnotsPageProps) {
-  const query = loadQuery("allKnots");
+  const query = loadQuery("basicKnots");
   const knots = await fetchDato(query);
 
   return (
     <div>
-      {knots.allKnots.map((knot) => {
+      {knots.basicKnots.map((knot) => {
         return (
           <CardBottomImage
             key={knot.name}
             src={knot.thumbnail.url}
             title={knot.name}
             description={knot.description}
-            redirectUrl={`/knot/${knot.id}`}
+            redirectUrl={`/basics/knot/${knot.id}`}
           />
         );
       })}

@@ -5,6 +5,13 @@ query KnotById($id: ItemId!) {
     description
     history
     uses
+    isbasic
+    linkedKnots {
+      links {
+        id
+        name
+      }
+    }
     gif {
       url
     }
