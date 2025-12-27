@@ -8,7 +8,7 @@ async function AllKnotsPage(props: AllKnotsPageProps) {
   const knots = await fetchDato(query);
 
   return (
-    <div>
+    <div className="grid grid-cols-[repeat(auto-fit,250px)] grid-rows-[min-content] gap-4 p-4 w-full">
       {knots.allKnots.map((knot) => {
         return (
           <CardBottomImage

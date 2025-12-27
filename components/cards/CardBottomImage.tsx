@@ -17,11 +17,7 @@ export default function CardBottomImage(props: CardBottomImageType) {
           <CardDescription>{props.description}</CardDescription>
         </CardHeader>
         <CardContent className="px-0">
-          <img
-            src={props.src}
-            alt="Knot image"
-            className="aspect-video h-70 rounded-b-xl object-cover"
-          />
+          <img src={props.src} alt="Knot image" className="aspect-square h-70 object-contain" />
         </CardContent>
       </Card>
     </Link>
