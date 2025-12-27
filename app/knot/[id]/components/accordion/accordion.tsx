@@ -14,6 +14,7 @@ type AccordionComponentPropsType = {
 
 export const AccordionComponent = (props: AccordionComponentPropsType) => {
   const { data } = props;
+  console.log(data);
   return (
     <Accordion type="multiple">
       {Array.isArray(data) &&

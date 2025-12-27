@@ -2,18 +2,20 @@ query KnotById($id: ItemId!) {
   knot(filter: { id: { eq: $id } }) {
     id
     name
-    description
-    history
-    uses
     isbasic
-    linkedKnots {
-      links {
-        id
-        name
-      }
-    }
     gif {
       url
+    }
+    knotData {
+      description
+      history
+      uses
+      linkedKnots {
+        links {
+          id
+          name
+        }
+      }
     }
   }
 }

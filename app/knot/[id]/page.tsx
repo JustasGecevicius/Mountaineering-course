@@ -1,6 +1,8 @@
 import GifPlayer from "@/components/gif/player";
 import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
-import { AccordionComponent } from "./components/accordion";
+import { AccordionComponent } from "./components/accordion/accordion";
+import { getAccordionData } from "@/hooks/use-accordion-data";
+import { formatAccortionData } from "./components/accordion/utils";
 
 type KnotPageProps = {};
 
@@ -8,19 +10,13 @@ export default async function KnotPage(props: KnotPageProps) {
   try {
     const { id } = await props.params;
     const query = loadQuery("knotById");
-    const knotData = await fetchDato(query, { id });
+    const data = await fetchDato(query, { id });
 
-    const { knot } = knotData || {};
-    const { gif, name, description, history, uses, linkedKnots } = knot || {};
+    const { knot } = data || {};
+    const { gif, name, knotData } = knot || {};
 
-    console.log("DATA", knot?.linkedKnots?.links);
-
-    const accordionData = [
-      { triggerText: "Description", contentText: description || "" },
-      { triggerText: "History", contentText: history || "" },
-      { triggerText: "Uses", contentText: uses || "" },
-      { triggerText: "Linked", contentElements: linkedKnots?.links || [] },
-    ];
+    const rawAccordionData = getAccordionData(knotData);
+    const accordionData = formatAccortionData(rawAccordionData);
 
     return (
       <div className="flex flex-col w-full gap-4 justify-start items-start">
