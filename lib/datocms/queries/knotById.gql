@@ -1,4 +1,4 @@
-query KnotById($id: ItemId!) {
+query knotById($id: ItemId!) {
   knot(filter: { id: { eq: $id } }) {
     id
     name

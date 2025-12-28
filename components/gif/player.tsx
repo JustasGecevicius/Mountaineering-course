@@ -10,6 +10,7 @@ type GifPlayerProps = {
   width?: number;
   height?: number;
   frameDelay?: number;
+  onStepChange: (index: number) => void;
 };
 
 export default function GifPlayer({
@@ -19,6 +20,7 @@ export default function GifPlayer({
   width,
   height,
   frameDelay,
+  onStepChange = () => {},
 }: GifPlayerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -51,6 +53,7 @@ export default function GifPlayer({
       return;
 
     drawFrame(frameIndexRef.current);
+    onStepChange(frameIndexRef.current);
 
     const frame = framesRef.current[frameIndexRef.current];
     const delay = Math.max(frameDelay || frame?.delay || 0, 20); // ms
@@ -72,6 +75,7 @@ export default function GifPlayer({
       e?.stopPropagation();
       frameIndexRef.current = (frameIndexRef.current + 1) % framesRef.current.length;
       drawFrame(frameIndexRef.current);
+      onStepChange(frameIndexRef.current);
     },
     [drawFrame]
   );
@@ -98,6 +102,7 @@ export default function GifPlayer({
       frameIndexRef.current =
         (frameIndexRef.current - 1 + framesRef.current.length) % framesRef.current.length;
       drawFrame(frameIndexRef.current);
+      onStepChange(frameIndexRef.current);
     },
     [drawFrame]
   );
@@ -116,6 +121,7 @@ export default function GifPlayer({
 
       framesRef.current = frames;
       frameIndexRef.current = 0;
+      onStepChange(frameIndexRef.current);
 
       const canvas = canvasRef.current!;
       canvas.width = width ?? gif.lsd.width;

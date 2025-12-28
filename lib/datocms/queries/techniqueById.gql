@@ -1,0 +1,16 @@
+query techniqueById($id: ItemId!) {
+  technique(filter: { id: { eq: $id } }) {
+    id
+    name
+    isbasic
+    gif {
+      url
+    }
+    steps {
+      value
+      links
+      inlineBlocks
+      blocks
+    }
+  }
+}

@@ -1,0 +1,15 @@
+query allTechniques {
+  allTechniques {
+    name
+    id
+    steps {
+      value
+      links
+      inlineBlocks
+      blocks
+    }
+    thumbnail {
+      url
+    }
+  }
+}
