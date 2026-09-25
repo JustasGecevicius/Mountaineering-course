@@ -8,7 +8,8 @@ import {
 type AccordionComponentPropsType = {
   data: {
     triggerText: string;
-    contentText: string;
+    contentText?: string;
+    contentElements?: { id: string; name: string }[];
   }[];
 };
 

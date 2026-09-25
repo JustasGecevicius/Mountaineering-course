@@ -1,6 +1,7 @@
 query allTechniques {
   allTechniques {
     name
+    isbasic
     id
     steps {
       value

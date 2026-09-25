@@ -1,27 +1,9 @@
-import CardBottomImage from "@/components/cards/CardBottomImage";
+import { LibraryView } from "@/components/library/LibraryView";
+import type { Lesson } from "@/components/cards/LessonCard";
 import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
 
-type AllKnotsPageProps = {};
-
-async function AllKnotsPage(props: AllKnotsPageProps) {
-  const query = loadQuery("allKnots");
-  const knots = await fetchDato(query);
-
-  return (
-    <div className="grid grid-cols-[repeat(auto-fit,250px)] grid-rows-[min-content] gap-4 p-4 w-full">
-      {knots.allKnots.map((knot) => {
-        return (
-          <CardBottomImage
-            key={knot.name}
-            src={knot.thumbnail.url}
-            title={knot.name}
-            description={knot.description}
-            redirectUrl={`/knot/${knot.id}`}
-          />
-        );
-      })}
-    </div>
-  );
+export default async function AllKnotsPage() {
+  let lessons: Lesson[] = [];
+  try { lessons = (await fetchDato<{ allKnots: Lesson[] }>(loadQuery("allKnots"))).allKnots || []; } catch { /* CMS may be unavailable during a local build. */ }
+  return <main className="library-page"><div className="library-heading"><div className="eyebrow">Interactive Curriculum</div><h1>Knots Library</h1></div><LibraryView lessons={lessons} kind="knot" />{!lessons.length && <p className="empty-state">Connect DatoCMS to show knot lessons.</p>}</main>;
 }
-
-export default AllKnotsPage;

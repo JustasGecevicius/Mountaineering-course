@@ -1,6 +1,10 @@
 query allKnots {
   allKnots {
     name
+    isbasic
+    knotData {
+      description
+    }
     thumbnail {
       url
     }

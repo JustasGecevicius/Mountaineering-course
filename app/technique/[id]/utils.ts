@@ -1,15 +1,13 @@
-export function mapSteps(stepsData: any[]): { type: "span"; value: string }[] {
-  const { value } = stepsData;
-  const { document } = value || {};
-  const { children } = document || {};
-  const [firstChild] = children || [];
-  const { children: x } = firstChild || [];
+type StructuredNode = { value?: string; children?: StructuredNode[] };
+type StructuredSteps = { value?: { document?: { children?: StructuredNode[] } } };
 
-  return x.map((child: any) => {
-    return getDeepSpan(child.children);
-  });
-}
-
-export function getDeepSpan(children: {}): any[] {
-  return children[0].children[0].value;
+export function mapSteps(stepsData?: StructuredSteps): { type: "span"; value: string }[] {
+  const roots = stepsData?.value?.document?.children || [];
+  const values: string[] = [];
+  const visit = (node: StructuredNode) => {
+    if (typeof node.value === "string" && node.value.trim()) values.push(node.value.trim());
+    node.children?.forEach(visit);
+  };
+  roots.forEach(visit);
+  return values.map((value) => ({ type: "span", value }));
 }

@@ -1,25 +1,9 @@
-import CardBottomImage from "@/components/cards/CardBottomImage";
+import { LibraryView } from "@/components/library/LibraryView";
+import type { Lesson } from "@/components/cards/LessonCard";
 import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
 
-type AllTechniquesPageProps = {};
-
-export default async function AllTechniquesPage(props: AllTechniquesPageProps) {
-  const query = loadQuery("allTechniques");
-  const techniques = await fetchDato(query);
-
-  return (
-    <div className="grid grid-cols-[repeat(auto-fit,250px)] grid-rows-[min-content] gap-4 p-4 w-full">
-      {techniques.allTechniques.map((technique) => {
-        return (
-          <CardBottomImage
-            key={technique.name}
-            src={technique.thumbnail.url}
-            title={technique.name}
-            description={technique.description}
-            redirectUrl={`/technique/${technique.id}`}
-          />
-        );
-      })}
-    </div>
-  );
+export default async function AllTechniquesPage() {
+  let lessons: Lesson[] = [];
+  try { lessons = (await fetchDato<{ allTechniques: Lesson[] }>(loadQuery("allTechniques"))).allTechniques || []; } catch { /* CMS may be unavailable during a local build. */ }
+  return <main className="library-page"><div className="library-heading"><div className="eyebrow">Interactive Curriculum</div><h1>Techniques Library</h1></div><LibraryView lessons={lessons} kind="technique" />{!lessons.length && <p className="empty-state">Connect DatoCMS to show technique lessons.</p>}</main>;
 }

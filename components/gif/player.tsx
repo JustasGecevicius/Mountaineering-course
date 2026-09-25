@@ -10,7 +10,7 @@ type GifPlayerProps = {
   width?: number;
   height?: number;
   frameDelay?: number;
-  onStepChange: (index: number) => void;
+  onStepChange?: (index: number) => void;
 };
 
 export default function GifPlayer({
@@ -31,7 +31,7 @@ export default function GifPlayer({
   const timeoutRef = useRef<number | null>(null);
 
   const [, forceRender] = useState(0); // UI updates only
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(!autoPlay);
 
   // Drawing
   const drawFrame = useCallback((index: number) => {
@@ -141,28 +141,16 @@ export default function GifPlayer({
     };
   }, [src]);
 
-  return (
-    <div className="relative rounded-3xl overflow-hidden">
-      <canvas ref={canvasRef} />
-      <div
-        className="flex gap-2 absolute bottom-0 top-0 left-0 right-0 justify-between"
-        onClick={startStop}
-      >
-        {isPaused && (
-          <div className="absolute top-0 bottom-0 left-0 right-0 inset-0 bg-black/30 flex items-center">
-            <div className="w-full flex justify-between items-center p-4">
-              <img onClick={prevFrame} src="/left_arrow.png" alt="left_arrow" className="w-8" />
-              <img src="/pause_button.png" alt="pause_button" className="w-8" />
-              <img
-                onClick={nextFrame}
-                src="/right_arrow.png"
-                alt="right_arrow"
-                className="w-8 aspect-square"
-              />
-            </div>
-          </div>
-        )}
-      </div>
+  const frameCount = framesRef.current.length;
+  return <div className="gif-player">
+    <canvas ref={canvasRef} />
+    <div className="gif-progress"><span style={{ width: `${frameCount ? ((frameIndexRef.current + 1) / frameCount) * 100 : 0}%` }} /></div>
+    <div className="gif-controls">
+      <button aria-label="Previous frame" onClick={prevFrame}>‹</button>
+      <button className="play-control" aria-label={isPaused ? "Play" : "Pause"} onClick={startStop}>{isPaused ? "▶" : "Ⅱ"}</button>
+      <button aria-label="Next frame" onClick={nextFrame}>›</button>
+      <span className="frame-count">{frameIndexRef.current + 1} / {frameCount || 1}</span>
+      <span className="active-step">Interactive step guide</span>
     </div>
-  );
+  </div>;
 }

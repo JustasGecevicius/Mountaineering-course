@@ -1,27 +1,5 @@
-import CardBottomImage from "@/components/cards/CardBottomImage";
-import { fetchDato, loadQuery } from "@/lib/datocms/datocms";
+import { redirect } from "next/navigation";
 
-type AllKnotsPageProps = {};
-
-async function BasicKnotsPage(props: AllKnotsPageProps) {
-  const query = loadQuery("basicKnots");
-  const knots = await fetchDato(query);
-
-  return (
-    <div>
-      {knots.allKnots.map((knot) => {
-        return (
-          <CardBottomImage
-            key={knot.name}
-            src={knot.thumbnail.url}
-            title={knot.name}
-            description={knot.description}
-            redirectUrl={`/knot/${knot.id}`}
-          />
-        );
-      })}
-    </div>
-  );
+export default function BasicKnotsPage() {
+  redirect("/knots");
 }
-
-export default BasicKnotsPage;

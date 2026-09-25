@@ -8,7 +8,7 @@ export const StepPlayer = (props: StepPlayerProps) => {
   return (
     <div>
       Step Number {currentStepIndex !== undefined ? currentStepIndex + 1 : 1} / {steps.length}
-      <div className="p-4 border rounded-md mt-2 w-full">{steps[currentStepIndex || 0]}</div>
+      <div className="p-4 border rounded-md mt-2 w-full">{steps[currentStepIndex || 0]?.value}</div>
     </div>
   );
 };
